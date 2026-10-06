@@ -8,7 +8,7 @@ import fielddash
 from conftest import EXAMPLE
 
 APP = str(Path(fielddash.__file__).resolve().parent / "app.py")
-CONFIG = str(EXAMPLE / "projeto.yaml")
+CONFIG = str(EXAMPLE / "project.yaml")
 
 
 def _plotly_stub(fig, *args, **kwargs):
@@ -28,7 +28,7 @@ def run(monkeypatch, page=None):
     return at
 
 
-@pytest.mark.parametrize("page", ["Overview", "Highlights", "Questions", "Reciclagem", "Data"])
+@pytest.mark.parametrize("page", ["Overview", "Highlights", "Questions", "Recycling", "Data"])
 def test_pages_render(monkeypatch, page):
     run(monkeypatch, page)
 

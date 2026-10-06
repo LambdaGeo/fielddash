@@ -1,0 +1,54 @@
+# Example: household solid-waste survey (Itaqui-Bacanga, São Luís – MA).
+# Anonymized data saved on disk. To read straight from Epicollect5, replace `source` with:
+#
+#   source:
+#     type: epicollect
+#     project: ${PROJECT_WASTE}        # project slug
+#     form_ref: ${FORM_WASTE_REF}      # optional
+#     credentials: WASTE               # WASTE_CLIENT_ID / WASTE_CLIENT_SECRET in .env
+
+title: "Diagnóstico de Resíduos – Itaqui-Bacanga"
+subtitle: "Exemplo com dados anonimizados"
+
+source:
+  type: json
+  data: responses.json
+  schema: form.json
+
+# Aliases: short name -> ref suffix, column or question text (see `fielddash fields`)
+fields:
+  localizacao: "f27864"
+  idade: "83aec3"
+  genero: "88c343"
+  etnia: "98c336"
+  bairro: "5401ce"
+  ocupacao: "d3aecb"
+  renda: "43aed7"
+  escolaridade: "127852"
+  frequencia_coleta: "23aee0"
+  destino_lixo: "48c35e"
+  separa_reciclagem: "527827"
+  avaliacao_coleta: "d27837"
+
+# Neighborhood is free text in the form; as a category it can be filtered and crossed
+types:
+  bairro: category
+
+ignore: ["2da40f", "3401cb", "f401ca"]   # consent, ZIP code, street
+
+filters: [created_at, bairro, idade, genero, renda]
+
+highlights:
+  - {field: frequencia_coleta, by: bairro}
+  - {field: destino_lixo}
+  - {field: avaliacao_coleta, by: renda}
+  - {field: separa_reciclagem, by: escolaridade}
+
+map:
+  field: localizacao
+  popup: [bairro, idade]
+
+# Custom pages for this project
+extensions: [pages]
+
+timezone: America/Fortaleza

@@ -8,8 +8,8 @@ from fielddash.core.schema import export_column, parse_form, reconcile
 
 from conftest import EXAMPLE
 
-FORM = EXAMPLE / "formulario.json"
-DATA = EXAMPLE / "dados.json"
+FORM = EXAMPLE / "form.json"
+DATA = EXAMPLE / "responses.json"
 
 
 @pytest.fixture(scope="module")
@@ -49,7 +49,7 @@ def test_renumbered_form_still_matches(schema, entries):
 
 
 def test_offline_dataset_types():
-    config = load_config(EXAMPLE / "projeto.yaml")
+    config = load_config(EXAMPLE / "project.yaml")
     bootstrap(config)
     ds = load_dataset(config)
     assert len(ds.df) == 18

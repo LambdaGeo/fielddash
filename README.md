@@ -1,5 +1,7 @@
 # fielddash
 
+**Documentation: <https://lambdageo.github.io/fielddash/>**
+
 Schema-driven dashboards for **field data collection** (Epicollect5), built directly from the **form schema**. Every question is identified by Epicollect's stable `ref`, and its input type (`radio`, `checkbox`, `integer`, `location`, ...) automatically dictates the filter, chart, and map representation. Modifying, adding, or reordering questions in the form does not break the dashboard, and setting up a new fieldwork survey requires only a YAML configuration file.
 
 Ready-to-use pages:
@@ -11,7 +13,7 @@ Ready-to-use pages:
 ## Installation
 
 ```bash
-pip install git+https://github.com/LambdaGeo/fielddash
+pip install fielddash
 # or for development:
 git clone https://github.com/LambdaGeo/fielddash && cd fielddash
 pip install -e ".[dev]"
@@ -20,35 +22,42 @@ pip install -e ".[dev]"
 ## Quickstart
 
 ```bash
-fielddash run exemplos/residuos/projeto.yaml
+fielddash run examples/waste/project.yaml
 ```
 
-The example uses anonymized household survey data on solid waste management (Itaqui-Bacanga, São Luís – MA) and showcases a custom project page (`Reciclagem`).
+The example uses anonymized household survey data on solid waste management (Itaqui-Bacanga, São Luís – MA) and showcases a custom project page (`Recycling`).
 
 ## Setting Up a New Field Project
 
-1. Create a project folder with a `.env` file containing your Epicollect app credentials (generated under *Apps* in your project's administration area):
+1. Scaffold the project folder:
    ```bash
-   MYPROJ_CLIENT_ID=...
-   MYPROJ_CLIENT_SECRET=...
+   fielddash init my-survey            # project.yaml, .env.example, .gitignore
+   fielddash init my-survey --deploy   # + streamlit_app.py, requirements.txt, secrets example
+   fielddash init my-survey --source json   # offline project reading data/ (git-ignored)
+   ```
+   Then `cp .env.example .env` and fill in the project slug and the Epicollect app credentials (generated under *Apps* in your project's administration area):
+   ```bash
+   PROJECT_MY_SURVEY=project-slug
+   MY_SURVEY_CLIENT_ID=...
+   MY_SURVEY_CLIENT_SECRET=...
    ```
    *Public projects do not require credentials: simply omit `credentials` in the config.*
 
-2. Create `myproject.yaml`:
+2. The generated `project.yaml` starts minimal (or write it by hand):
    ```yaml
    title: "My Field Survey"
    source:
      type: epicollect
-     project: project-slug      # or ${VARIABLE} from .env
-     credentials: MYPROJ
+     project: ${PROJECT_MY_SURVEY}    # slug, or the literal value
+     credentials: MY_SURVEY
    ```
 
 3. Inspect the form fields to select aliases, filters, and highlights:
    ```bash
-   fielddash fields myproject.yaml
+   fielddash fields project.yaml
    ```
 
-4. Complete the configuration (all keys below are optional) and run `fielddash run myproject.yaml`:
+4. Complete the configuration (all keys below are optional) and run `fielddash run project.yaml`:
    ```yaml
    subtitle: "Research team, institution..."
    fields:            # alias -> ref suffix, column, or question label
@@ -67,10 +76,10 @@ The example uses anonymized household survey data on solid waste management (Ita
    timezone: America/Fortaleza
    cache_minutes: 5
    ```
-   *(Note: Portuguese configuration keys such as `titulo`, `fonte`, `campos`, `ignorar`, etc., are also supported for backwards compatibility).*
+   *(Portuguese keys from early versions — `titulo`, `fonte`, `campos`, ... — still load but are deprecated and emit a warning.)*
 
 Running `fielddash run folder/` will scan all `.yaml` files in the directory and present a project selector in the sidebar.
-To work offline or test without internet access, use `source: {type: json, data: ..., schema: ...}` (as shown in `exemplos/residuos/projeto.yaml`).
+To work offline or test without internet access, use `source: {type: json, data: ..., schema: ...}` (as shown in `examples/waste/project.yaml`).
 
 ## Using in a Custom Streamlit Script / Deployment
 
@@ -90,14 +99,35 @@ streamlit run streamlit_app.py
 ```
 
 ### Streamlit Community Cloud
-Deploy your repository (containing `streamlit_app.py`, your `.yaml` configs, and a `requirements.txt` with `fielddash @ git+https://github.com/LambdaGeo/fielddash`), then add credentials in *Settings → Secrets* in TOML format:
 
-```toml
-MYPROJ_CLIENT_ID = "..."
-MYPROJ_CLIENT_SECRET = "..."
-```
+1. Create the project with the deploy files and try it locally:
+   ```bash
+   pip install fielddash
+   fielddash init my-survey --deploy
+   cd my-survey
+   cp .env.example .env          # fill in, then edit project.yaml
+   streamlit run streamlit_app.py
+   ```
+2. Push the folder to a GitHub repository. `.env` and `.streamlit/secrets.toml` are git-ignored: credentials never go to the repo.
+3. On [share.streamlit.io](https://share.streamlit.io) choose *Create app*, pick the repository and branch, and set `streamlit_app.py` as the main file.
+4. Under *Advanced settings → Secrets* (later: *Settings → Secrets*) paste the content of `.streamlit/secrets.toml.example`, filled in:
+   ```toml
+   FIELD_ACCESS_PIN = "choose-a-code"
+   PROJECT_MY_SURVEY = "project-slug"
+   MY_SURVEY_CLIENT_ID = "..."
+   MY_SURVEY_CLIENT_SECRET = "..."
+   ```
+5. Deploy, then share the app link, or `https://<your-app>.streamlit.app/?token=<code>` to skip the login screen.
+
+Notes:
+- Use `source: {type: epicollect}` for the cloud. A `type: json` project reads `data/`, which is git-ignored on purpose (it may hold personal data), so it only works locally.
+- Without `FIELD_ACCESS_PIN` the app is public: anyone with the link sees the data.
 
 `fielddash` checks environment variables and `.env` first, then falls back to `st.secrets` (also resolving `${VAR}` references in YAML). The data cache is shared among server sessions, so Epicollect receives at most one request per project every `cache_minutes`.
+
+### Restricting access
+
+A deployed Streamlit app is public by default. Add `fielddash.require_access()` before `fielddash.dashboard(...)` (`fielddash init --deploy` already does) and set `FIELD_ACCESS_PIN` in the secrets: visitors then see a login screen, or can use a link ending in `?token=<code>`. Without the variable the call does nothing.
 
 ### Self-Hosted Server
 ```bash
@@ -128,7 +158,9 @@ def render(ctx):
 
 ```
 fielddash/
-  cli.py            CLI commands `fielddash run` and `fielddash fields`
+  cli.py            CLI commands `fielddash init`, `run` and `fields`
+  scaffold.py       templates and writer behind `fielddash init`
+  access.py         `fielddash.require_access()`: optional PIN/token gate
   web.py            `fielddash.dashboard()`: config, cache, filters, navigation
   app.py            Streamlit entry point used by `fielddash run`
   core/schema.py    Epicollect schema parser -> list[Field], column naming, reconciliation
@@ -137,9 +169,9 @@ fielddash/
   sources/          data source plugins (@source): epicollect (API, pagination), json
   ui/               dynamic filters, charts, and maps based on field types
   views/            default pages (@page): Overview, Highlights, Questions, Data
-exemplos/           example projects with anonymized datasets
+examples/           example projects with anonymized datasets
 tests/              pytest test suite (schema, index shifting, AppTest integration)
-docs/PLANO.md       historical development plan
+docs/               MkDocs site (`mkdocs serve`); docs/history/ holds the original development plan
 ```
 
 ## Running Tests
@@ -147,6 +179,21 @@ docs/PLANO.md       historical development plan
 ```bash
 pytest
 ```
+
+## Building the Documentation
+
+```bash
+pip install -e ".[docs]"
+mkdocs serve            # http://127.0.0.1:8000
+mkdocs build --strict   # what CI runs
+```
+
+## Releasing (maintainers)
+
+1. Bump the version in `pyproject.toml`, `fielddash/__init__.py` and `CITATION.cff`.
+2. Publish a GitHub Release: `.github/workflows/publish.yml` builds the package and uploads it to PyPI through Trusted Publishing (no token stored).
+
+One-time setup on pypi.org → *Publishing* → *Add a new pending publisher*: project `fielddash`, owner `LambdaGeo`, repository `fielddash`, workflow `publish.yml`. PyPI never lets a published version be overwritten, so check with `python -m build && twine check dist/*` (and optionally TestPyPI) first.
 
 ## Authors
 

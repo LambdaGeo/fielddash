@@ -6,8 +6,10 @@ __pycache__/
 token.json
 build/
 dist/
+site/
 
-# Projetos locais (configs com slugs/credenciais de cada usuário)
+# Local projects (each user's configs with slugs/credentials)
+projects/
 projetos/
 
 # Segredos locais do Streamlit

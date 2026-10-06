@@ -18,7 +18,7 @@ def _config_arg() -> str:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config")
     args, _ = parser.parse_known_args()
-    return args.config or os.environ.get(ENV_CONFIG) or os.environ.get("GEOCOLETA_CONFIG") or "."
+    return args.config or os.environ.get(ENV_CONFIG) or "."
 
 
 dashboard(_config_arg())

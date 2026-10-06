@@ -16,7 +16,7 @@ def page(name: str, order: int = 100, available=None):
 
 
 def source(kind: str):
-    """Registers a data source class by the value of `source.type` (or `fonte.tipo`) in config."""
+    """Registers a data source class by the value of `source.type` in config."""
     def decorator(cls):
         SOURCE_REGISTRY[kind] = cls
         return cls

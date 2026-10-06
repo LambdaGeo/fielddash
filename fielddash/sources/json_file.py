@@ -15,8 +15,8 @@ class JsonFileSource(DataSource):
 
     source:
       type: json
-      schema: formulario.json
-      data: dados.json          # optional: omitted data defaults to an empty dataset
+      schema: form.json
+      data: responses.json         # optional: omitted data defaults to an empty dataset
     """
 
     def fetch_schema(self):
@@ -25,7 +25,7 @@ class JsonFileSource(DataSource):
         return _read(self.config.resolve(self.options["schema"]))
 
     def fetch_entries(self):
-        target = self.options.get("data") or self.options.get("dados")
+        target = self.options.get("data")
         if not target:
             return []
         data = _read(self.config.resolve(target))

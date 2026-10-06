@@ -1,0 +1,87 @@
+site_name: fielddash
+site_description: >
+  Schema-driven dashboards for field data collection (Epicollect5):
+  one YAML file per survey, filters, charts, maps and data export generated from the form.
+site_author: "LambdaGeo / UFMA"
+site_url: https://lambdageo.github.io/fielddash/
+repo_url: https://github.com/LambdaGeo/fielddash
+repo_name: LambdaGeo/fielddash
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  font: false
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - content.tooltips
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+plugins:
+  - search
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences
+  - tables
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/lambdageo.css
+
+nav:
+  - "⇦ Coleção LambdaGeo": https://lambdageo.github.io/ebooks/
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Guide:
+    - Configuration: configuration.md
+    - How it works: how-it-works.md
+    - Data sources: sources.md
+    - Extending: extending.md
+  - Operations:
+    - Deployment: deployment.md
+    - Privacy and data protection: privacy.md
+  - Reference:
+    - Command line: cli.md
+  - History:
+    - "Development plan (pt)": history/plano.md
