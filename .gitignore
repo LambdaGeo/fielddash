@@ -9,3 +9,6 @@ dist/
 
 # Projetos locais (configs com slugs/credenciais de cada usuário)
 projetos/
+
+# Segredos locais do Streamlit
+.streamlit/secrets.toml

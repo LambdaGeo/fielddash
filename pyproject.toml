@@ -13,6 +13,25 @@ authors = [
     { name = "Sergio Costa, LambdaGeo / UFMA" },
     { name = "André Moura, LambdaGeo / UFMA" },
 ]
+keywords = [
+    "epicollect5",
+    "fieldwork",
+    "data-collection",
+    "streamlit",
+    "gis",
+    "survey",
+    "geoprocessing",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: GIS",
+]
 dependencies = [
     "streamlit>=1.39",
     "pandas>=2.0",
@@ -23,6 +42,12 @@ dependencies = [
     "PyYAML>=6.0",
     "openpyxl>=3.1",
 ]
+
+[project.urls]
+Homepage = "https://github.com/LambdaGeo/fielddash"
+Repository = "https://github.com/LambdaGeo/fielddash"
+Documentation = "https://github.com/LambdaGeo/fielddash#readme"
+"Bug Tracker" = "https://github.com/LambdaGeo/fielddash/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]

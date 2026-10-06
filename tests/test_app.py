@@ -51,3 +51,36 @@ def test_dashboard_function_in_user_script(monkeypatch):
     at.run()
     assert not at.exception, at.exception
     assert at.title[0].value == "Diagnóstico de Resíduos – Itaqui-Bacanga"
+
+
+def test_root_streamlit_app_public(monkeypatch):
+    monkeypatch.setattr(streamlit, "plotly_chart", _plotly_stub)
+    monkeypatch.setenv("FIELDDASH_CONFIG", CONFIG)
+    root_script = Path(__file__).parent.parent / "streamlit_app.py"
+    monkeypatch.setattr("sys.argv", [str(root_script)])
+    at = AppTest.from_file(str(root_script), default_timeout=60)
+    at.run()
+    assert not at.exception, at.exception
+    assert at.title[0].value == "Diagnóstico de Resíduos – Itaqui-Bacanga"
+
+
+def test_root_streamlit_app_with_pin_protection(monkeypatch):
+    monkeypatch.setattr(streamlit, "plotly_chart", _plotly_stub)
+    monkeypatch.setenv("FIELDDASH_CONFIG", CONFIG)
+    monkeypatch.setenv("FIELD_ACCESS_PIN", "secret123")
+    root_script = Path(__file__).parent.parent / "streamlit_app.py"
+    monkeypatch.setattr("sys.argv", [str(root_script)])
+
+    # 1. Unauthenticated run stops at login prompt
+    at = AppTest.from_file(str(root_script), default_timeout=60)
+    at.run()
+    assert not at.exception, at.exception
+    assert len(at.title) == 0  # didn't load dashboard title
+
+    # 2. Enter correct PIN and submit
+    at.text_input[0].input("secret123")
+    at.button[0].click().run()
+    assert not at.exception, at.exception
+    assert at.title[0].value == "Diagnóstico de Resíduos – Itaqui-Bacanga"
+
+

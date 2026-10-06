@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software in your research or fieldwork, please cite it as below."
+title: "fielddash: Schema-driven dashboards for field data collection"
+abstract: "A schema-driven dashboard framework for Epicollect5 field data collection. It builds dynamic interactive maps, summary statistics, filters, questions, and data tables directly from the mobile form schema, ensuring resilience to ongoing form updates."
+authors:
+  - family-names: Costa
+    given-names: Sergio
+    affiliation: "LambdaGeo / Universidade Federal do Maranhão (UFMA)"
+  - family-names: Moura
+    given-names: André
+    affiliation: "LambdaGeo / Universidade Federal do Maranhão (UFMA)"
+version: 0.1.0
+date-released: "2026-10-06"
+url: "https://github.com/LambdaGeo/fielddash"
+repository-code: "https://github.com/LambdaGeo/fielddash"
+license: MIT
+keywords:
+  - "epicollect5"
+  - "fieldwork"
+  - "mobile data collection"
+  - "data collection"
+  - "gis"
+  - "geoprocessing"
+  - "streamlit"
+  - "dashboard"
