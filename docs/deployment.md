@@ -16,9 +16,10 @@ fielddash.dashboard("projects/")           # ...or a folder: selector in the sid
 
 1. Create the project with the deploy files and try it locally:
    ```bash
+   mkdir my-survey && cd my-survey
+   python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
    pip install fielddash
-   fielddash init my-survey --deploy
-   cd my-survey
+   fielddash init . --deploy
    cp .env.example .env          # fill in, then edit project.yaml
    streamlit run streamlit_app.py
    ```

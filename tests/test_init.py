@@ -18,7 +18,7 @@ def _plotly_stub(fig, *args, **kwargs):
 def test_init_epicollect_creates_files_and_valid_config(tmp_path, monkeypatch):
     target = tmp_path / "my-survey"
     assert main(["init", str(target)]) == 0
-    assert {p.name for p in target.iterdir()} == {"project.yaml", ".gitignore", ".env.example"}
+    assert {p.name for p in target.iterdir()} == {"project.yaml", ".gitignore", ".env.example", "requirements.txt"}
     assert "MY_SURVEY_CLIENT_ID" in (target / ".env.example").read_text()
 
     monkeypatch.setenv("PROJECT_MY_SURVEY", "some-slug")
@@ -27,6 +27,14 @@ def test_init_epicollect_creates_files_and_valid_config(tmp_path, monkeypatch):
     assert config.source["type"] == "epicollect"
     assert config.source["project"] == "some-slug"
     assert config.source["credentials"] == "MY_SURVEY"
+
+
+def test_init_prints_environment_steps(tmp_path, capsys):
+    main(["init", str(tmp_path / "survey")])
+    output = capsys.readouterr().out
+    assert "python -m venv .venv" in output
+    assert "pip install -r requirements.txt" in output
+    assert output.index("pip install -r") < output.index("fielddash run")
 
 
 def test_init_json_ignores_data_folder(tmp_path):

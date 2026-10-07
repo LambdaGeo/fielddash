@@ -22,9 +22,10 @@ The input type of each question (`radio`, `checkbox`, `integer`, `location`, ...
 ## Quick start
 
 ```bash
+mkdir my-survey && cd my-survey
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install fielddash
-fielddash init my-survey
-cd my-survey
+fielddash init .
 cp .env.example .env              # project slug and Epicollect credentials
 fielddash fields project.yaml     # list the form's questions
 fielddash run project.yaml

@@ -122,11 +122,11 @@ def files(name: str, source: str = "epicollect", deploy: bool = False) -> dict:
     project = PROJECT_EPICOLLECT if epicollect else PROJECT_JSON
     out = {"project.yaml": render(project, TITLE=title, PREFIX=prefix, BODY=BODY)}
     out[".gitignore"] = GITIGNORE if epicollect else GITIGNORE + "data/\n"
+    out["requirements.txt"] = REQUIREMENTS
     if epicollect:
         out[".env.example"] = render(ENV_EXAMPLE, PREFIX=prefix)
     if deploy:
         out["streamlit_app.py"] = render(STREAMLIT_APP, TITLE=title)
-        out["requirements.txt"] = REQUIREMENTS
         credentials = render(SECRETS_CREDENTIALS, PREFIX=prefix) if epicollect else ""
         out[".streamlit/secrets.toml.example"] = render(SECRETS_EXAMPLE, CREDENTIALS=credentials)
     return out

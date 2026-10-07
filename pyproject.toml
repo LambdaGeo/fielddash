@@ -11,8 +11,10 @@ requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-    { name = "Sergio Costa, LambdaGeo / UFMA" },
-    { name = "André Moura, LambdaGeo / UFMA" },
+    { name = "Sergio Souza Costa", email = "sergio.costa@ufma.br" },
+    { name = "André Moura Lima" },
+    { name = "Ricardo Luvizotto Santos", email = "ricardo.luvizotto@ufma.br" },
+    { name = "Marianna Basso Jorge", email = "mb.jorge@ufma.br" },
 ]
 keywords = [
     "epicollect5",

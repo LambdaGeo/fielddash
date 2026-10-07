@@ -15,10 +15,10 @@ Creates a new project folder (default: the current directory).
 | `DIRECTORY` | Folder to create or use. |
 | `--name NAME` | Project name, used for the title and the variable names (`MY_SURVEY_CLIENT_ID`). Default: the folder name. |
 | `--source` | `epicollect` (default) or `json` (offline, reads `data/`). |
-| `--deploy` | Also write `streamlit_app.py`, `requirements.txt` and `.streamlit/secrets.toml.example`. |
+| `--deploy` | Also write `streamlit_app.py` and `.streamlit/secrets.toml.example`. |
 | `--force` | Overwrite files that already exist. Without it they are skipped and listed. |
 
-Always written: `project.yaml` and `.gitignore`. For `epicollect` also `.env.example`.
+Always written: `project.yaml`, `requirements.txt` and `.gitignore`. For `epicollect` also `.env.example`. It ends by printing the next steps: environment, credentials, `fielddash fields`, `fielddash run`.
 
 ## `fielddash fields`
 

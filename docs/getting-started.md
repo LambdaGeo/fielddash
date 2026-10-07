@@ -2,18 +2,24 @@
 
 ## Install
 
+fielddash is a regular Python package (Python 3.10 or newer). Install it in an isolated environment rather than globally: a virtual environment per project keeps the dependencies (Streamlit, pandas, ...) of one survey apart from another and from your system Python.
+
+If you only want the command line (`init`, `fields`, `run`) and never edit code in the project, a tool installer is enough:
+
 ```bash
-pip install fielddash
+pipx install fielddash          # or: uv tool install fielddash
 ```
 
-Python 3.10 or newer. For development, clone the repository and run `pip install -e ".[dev]"`.
+The `streamlit_app.py` that `--deploy` generates, and custom pages with extra packages, import `fielddash` from your project, so for those use a project environment as shown below.
 
 ## Try the bundled example
 
-The repository ships an example with anonymized household survey data (solid waste, Itaqui-Bacanga, São Luís, MA) that works offline:
+The example (anonymized household survey data on solid waste, Itaqui-Bacanga, São Luís, MA) lives in the repository and is not part of the PyPI package. It works offline:
 
 ```bash
 git clone https://github.com/LambdaGeo/fielddash && cd fielddash
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e .
 fielddash run examples/waste/project.yaml
 ```
 
@@ -21,24 +27,38 @@ It also shows a project-specific page (`Recycling`); see [Extending](extending.m
 
 ## Start your own project
 
-```bash
-fielddash init my-survey
-cd my-survey
-```
+=== "venv + pip"
 
-This creates:
+    ```bash
+    mkdir my-survey && cd my-survey
+    python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+    pip install fielddash
+    fielddash init .
+    ```
+
+=== "pipx / uv (nothing installed first)"
+
+    ```bash
+    pipx run fielddash init my-survey       # or: uvx fielddash init my-survey
+    cd my-survey
+    python -m venv .venv && source .venv/bin/activate
+    pip install -r requirements.txt
+    ```
+
+`init` creates:
 
 | File | Purpose |
 |------|---------|
 | `project.yaml` | The dashboard configuration, with every option documented in comments. |
+| `requirements.txt` | Just `fielddash`: `pip install -r requirements.txt` rebuilds the environment, and Streamlit Community Cloud installs from it. |
 | `.env.example` | Names of the variables you need (project slug, client id and secret). |
 | `.gitignore` | Keeps `.env`, `token.json` and `.streamlit/secrets.toml` out of Git. |
 
 Useful variants:
 
 ```bash
-fielddash init my-survey --deploy         # + streamlit_app.py, requirements.txt, secrets example
-fielddash init my-survey --source json    # offline project reading data/ (git-ignored)
+fielddash init . --deploy         # + streamlit_app.py, secrets example
+fielddash init . --source json    # offline project reading data/ (git-ignored)
 ```
 
 Existing files are never overwritten unless you pass `--force`.

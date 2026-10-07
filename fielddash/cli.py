@@ -50,6 +50,8 @@ def init(args) -> int:
     steps = []
     if directory != Path("."):
         steps.append(f"cd {directory}")
+    steps.append("python -m venv .venv && source .venv/bin/activate   # Windows: .venv\\Scripts\\activate (skip if you already use an environment)")
+    steps.append("pip install -r requirements.txt")
     if args.source == "epicollect":
         steps.append("cp .env.example .env   # fill in the project slug and credentials")
     else:
