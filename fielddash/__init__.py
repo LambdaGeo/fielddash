@@ -1,6 +1,6 @@
 """fielddash: schema-driven dashboards for field data collection (Epicollect5)."""
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def dashboard(target=".", *, configure_page: bool = True):
