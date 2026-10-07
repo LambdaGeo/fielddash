@@ -31,11 +31,6 @@ class EpicollectError(RuntimeError):
 
 def _read_cache() -> dict:
     try:
-        if not TOKEN_CACHE.exists():
-            # Check legacy geocoleta cache location if present
-            legacy = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "geocoleta" / "tokens.json"
-            if legacy.exists():
-                return json.loads(legacy.read_text())
         data = json.loads(TOKEN_CACHE.read_text())
         return data if isinstance(data, dict) else {}
     except (OSError, ValueError):
@@ -46,7 +41,7 @@ def _write_cache(update):
     try:
         cache = _read_cache()
         tokens = {k: v for k, v in cache.get("tokens", {}).items() if v[1] > time.time()}
-        cache = update({"tokens": tokens, "blocked_until": cache.get("blocked_until") or cache.get("bloqueado_ate", 0)})
+        cache = update({"tokens": tokens, "blocked_until": cache.get("blocked_until", 0)})
         TOKEN_CACHE.parent.mkdir(parents=True, exist_ok=True)
         TOKEN_CACHE.touch(mode=0o600, exist_ok=True)
         TOKEN_CACHE.write_text(json.dumps(cache))
@@ -56,7 +51,7 @@ def _write_cache(update):
 
 def _blocked_until() -> float:
     cache = _read_cache()
-    cached_val = cache.get("blocked_until") or cache.get("bloqueado_ate", 0)
+    cached_val = cache.get("blocked_until", 0)
     return max(_blocked["until"], float(cached_val))
 
 
@@ -139,21 +134,21 @@ class EpicollectSource(DataSource):
 
     source:
       type: epicollect
-      project: ${PROJECT_RESIDUOS}     # project slug
-      form_ref: ${FORM_RESIDUOS_REF}   # optional (default: first form)
-      credentials: RESIDUOS            # uses RESIDUOS_CLIENT_ID / RESIDUOS_CLIENT_SECRET
+      project: ${PROJECT_MYPROJ}     # project slug
+      form_ref: ${FORM_MYPROJ_REF}   # optional (default: first form)
+      credentials: MYPROJ            # uses MYPROJ_CLIENT_ID / MYPROJ_CLIENT_SECRET
       schema: ../form.json             # optional: local schema fallback if project API fails
     """
 
     @property
     def project(self) -> str:
-        proj = self.options.get("project") or self.options.get("projeto")
+        proj = self.options.get("project")
         if not proj:
-            raise KeyError("Epicollect source requires 'project' (or 'projeto')")
+            raise KeyError("Epicollect source requires 'project'")
         return proj
 
     def _get(self, url, params=None, max_retries: int = 2):
-        creds = self.options.get("credentials") or self.options.get("credenciais")
+        creds = self.options.get("credentials")
         token = get_token(creds)
         headers = {"Authorization": f"Bearer {token}"} if token else {}
 

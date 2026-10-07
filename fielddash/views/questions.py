@@ -15,7 +15,7 @@ def _sections(ctx: PageContext):
     if config_sections:
         sections = []
         for section in config_sections:
-            f_keys = section.get("fields") or section.get("campos", [])
+            f_keys = section.get("fields", [])
             s_title = section.get("title") or section.get("titulo", "Section")
             found = [ds.find(k) for k in f_keys]
             sections.append((s_title, [f for f in found if f in fields]))

@@ -1,4 +1,5 @@
 import re
+import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -26,7 +27,8 @@ def _expand(value):
     return value
 
 
-KEY_MAP = {
+# Portuguese keys from earlier versions: still accepted (with a FutureWarning), use English keys.
+LEGACY_KEYS = {
     "titulo": "title",
     "subtitulo": "subtitle",
     "fonte": "source",
@@ -42,7 +44,7 @@ KEY_MAP = {
     "cache_minutos": "cache_minutes",
 }
 
-SOURCE_KEY_MAP = {
+LEGACY_SOURCE_KEYS = {
     "tipo": "type",
     "projeto": "project",
     "credenciais": "credentials",
@@ -67,59 +69,6 @@ class Config:
     timezone: str = "America/Fortaleza"
     cache_minutes: int = 5
 
-    # Portuguese property aliases for backwards compatibility
-    @property
-    def titulo(self) -> str:
-        return self.title
-
-    @property
-    def subtitulo(self) -> str:
-        return self.subtitle
-
-    @property
-    def fonte(self) -> dict:
-        return self.source
-
-    @property
-    def campos(self) -> dict:
-        return self.fields
-
-    @property
-    def ignorar(self) -> list:
-        return self.ignore
-
-    @property
-    def tipos(self) -> dict:
-        return self.types
-
-    @property
-    def filtros(self) -> list:
-        return self.filters
-
-    @property
-    def destaques(self) -> list:
-        return self.highlights
-
-    @property
-    def secoes(self) -> list:
-        return self.sections
-
-    @property
-    def mapa(self) -> dict:
-        return self.map
-
-    @property
-    def extensoes(self) -> list:
-        return self.extensions
-
-    @property
-    def fuso(self) -> str:
-        return self.timezone
-
-    @property
-    def cache_minutos(self) -> int:
-        return self.cache_minutes
-
     @property
     def base_dir(self) -> Path:
         return self.path.parent
@@ -136,21 +85,26 @@ def load_config(path) -> Config:
     with open(path, encoding="utf-8") as f:
         raw = yaml.safe_load(f) or {}
 
-    # Normalize Portuguese keys to English
-    normalized = {}
-    for k, v in raw.items():
-        canonical = KEY_MAP.get(k, k)
-        normalized[canonical] = v
+    normalized, legacy = {}, []
+    for key, value in raw.items():
+        canonical = LEGACY_KEYS.get(key, key)
+        if canonical != key:
+            legacy.append(f"{key} -> {canonical}")
+        normalized[canonical] = value
 
-    normalized["source"] = _expand(normalized.get("source") or {})
-    src = {}
-    for sk, sv in normalized["source"].items():
-        src[SOURCE_KEY_MAP.get(sk, sk)] = sv
-        src[sk] = sv
-    normalized["source"] = src
+    source = {}
+    for key, value in _expand(normalized.get("source") or {}).items():
+        canonical = LEGACY_SOURCE_KEYS.get(key, key)
+        if canonical != key:
+            legacy.append(f"source.{key} -> source.{canonical}")
+        source[canonical] = value
+    normalized["source"] = source
 
-    if "type" not in normalized["source"] and "tipo" not in normalized["source"]:
-        raise ValueError(f"{path.name}: 'source.type' (or 'fonte.tipo') is required")
+    if legacy:
+        warnings.warn(f"{path.name}: Portuguese config keys are deprecated, rename: {', '.join(legacy)}", FutureWarning, stacklevel=2)
+
+    if "type" not in source:
+        raise ValueError(f"{path.name}: 'source.type' is required")
 
     known = Config.__dataclass_fields__.keys() - {"path"}
     unknown = set(normalized) - known

@@ -41,7 +41,7 @@ def _load_extension(file: Path):
 
 
 def load_dataset(config: Config) -> Dataset:
-    kind = config.source.get("type") or config.source.get("tipo")
+    kind = config.source.get("type")
     if kind not in SOURCE_REGISTRY:
         raise ValueError(f"Unknown data source: {kind!r} (available: {', '.join(SOURCE_REGISTRY)})")
     return SOURCE_REGISTRY[kind](config).load()
